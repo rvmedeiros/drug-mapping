@@ -43,3 +43,6 @@ venv.bak/
 
 # Logs
 *.log
+package-lock.json
+dist
+.DS_Store
