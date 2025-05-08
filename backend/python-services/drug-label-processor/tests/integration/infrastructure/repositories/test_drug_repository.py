@@ -1,6 +1,6 @@
 import pytest
 from pymongo import MongoClient
-from src.infrastructure.database.mongo_drug_label_repository import MongoDrugLabelRepository
+from src.infrastructure.database.mongo_database import MongoDrugLabelRepository
 from src.core.entities.drug_label import DrugLabel
 
 @pytest.fixture

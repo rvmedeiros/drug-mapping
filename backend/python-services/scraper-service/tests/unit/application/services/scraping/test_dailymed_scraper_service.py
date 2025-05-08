@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-from infrastructure.scraping.dailymed_scraper import DailyMedScraper
+from src.application.services.scraping.dailymed_scraper_service import DailyMedScraper
 
 load_dotenv()
 

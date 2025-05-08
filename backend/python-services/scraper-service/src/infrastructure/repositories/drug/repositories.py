@@ -1,7 +1,7 @@
 from fastapi import Depends
 from pymongo.database import Database
-from domain.repositories.drug_repository import DrugRepository
-from infrastructure.config.database import get_db
+from infrastructure.database.databases import get_db
+from infrastructure.repositories.drug.drug_repository import DrugRepository
 from infrastructure.repositories.drug.mongodb_drug_repository import MongoDBDrugRepository
 
 async def get_drug_repository(db = Depends(get_db)) -> DrugRepository:

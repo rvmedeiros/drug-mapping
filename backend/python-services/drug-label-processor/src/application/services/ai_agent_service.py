@@ -3,8 +3,7 @@ from groq import AsyncGroq
 import asyncio
 import os
 from dotenv import load_dotenv
-from src.core.services.indication_mapper import IndicationMapper
-
+from src.application.interfaces.indication_mapper_interface import IndicationMapper
 
 class Phi2IndicationMapper(IndicationMapper):
     def __init__(self):
@@ -71,6 +70,5 @@ class Phi2IndicationMapper(IndicationMapper):
             return predefined
         return await self._query_groq(indication)
 
-    # Versão síncrona wrapper para compatibilidade
     def map_to_icd10(self, indication: str) -> List[str]:
         return asyncio.run(self.map_to_icd10_async(indication))

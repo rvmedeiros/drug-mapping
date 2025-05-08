@@ -3,7 +3,7 @@ from unittest.mock import Mock, patch
 from pymongo.collection import Collection
 from datetime import datetime
 from src.core.entities.drug_label import DrugLabel, ProcessedIndication
-from src.infrastructure.database.mongo_drug_label_repository import MongoDrugLabelRepository
+from src.infrastructure.database.mongo_database import MongoDrugLabelRepository
 
 @pytest.fixture
 def mock_collection():

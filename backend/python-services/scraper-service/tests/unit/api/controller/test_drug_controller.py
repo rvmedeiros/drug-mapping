@@ -2,8 +2,8 @@ import pytest
 from fastapi.testclient import TestClient
 from unittest.mock import MagicMock, patch
 from src.main import app
-from src.domain.repositories.drug_repository import DrugRepository
-from src.infrastructure.config.database import DatabaseConnections
+from src.infrastructure.repositories.drug.drug_repository import DrugRepository
+from src.infrastructure.database.databases import DatabaseConnections
 
 client = TestClient(app)
 

@@ -5,7 +5,7 @@ description = "scraper dailymed website"
 authors = [{name = "Rafael Vasconcellos de Medeiros", email = "rafaeldesenv.net@gmail.com"}]
 requires-python = ">=3.9"
 dependencies = [
-    "fastapi˜,
+    "fastapi",
     "uvicorn",
     "pymongo",
     "psycopg2-binary",

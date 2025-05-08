@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends, HTTPException
 from api.controller.drug_controller import router as drug_router
-from infrastructure.config.database import get_db, DatabaseConnections
+from infrastructure.database.databases import get_db, DatabaseConnections
 import logging
 
 logging.basicConfig(level=logging.INFO)

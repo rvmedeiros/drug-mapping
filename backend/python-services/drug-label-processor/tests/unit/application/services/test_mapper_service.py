@@ -1,5 +1,5 @@
 from unittest.mock import Mock
-from src.core.services.indication_mapper import IndicationMapper
+from src.application.interfaces.indication_mapper_interface import IndicationMapper
 
 def test_indication_mapper_interface():
     mapper = Mock(spec=IndicationMapper)

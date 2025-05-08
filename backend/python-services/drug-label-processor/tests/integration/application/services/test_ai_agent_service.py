@@ -1,5 +1,5 @@
 import pytest
-from src.infrastructure.mapper.phi2_indication_mapper import Phi2IndicationMapper
+from src.application.services.ai_agent_service import Phi2IndicationMapper
 
 @pytest.fixture(scope="module")
 def mapper():

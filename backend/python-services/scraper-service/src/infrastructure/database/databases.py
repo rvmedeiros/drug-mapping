@@ -5,8 +5,6 @@ import psycopg2.pool
 import redis
 from fastapi import Request
 from dotenv import load_dotenv
-from typing import AsyncGenerator
-from contextlib import asynccontextmanager
 
 load_dotenv()
 
@@ -15,7 +13,7 @@ class DatabaseConnections:
         # MongoDB connection
         mongo_db_name = os.getenv("MONGO_DB_NAME")
         if not mongo_db_name:
-            raise ValueError("Variável de ambiente MONGO_DB_NAME não está definida")
+            raise ValueError("Environment variable MONGO_DB_NAME is not defined")
         
         self.mongo_client = MongoClient(
             host=os.getenv("MONGO_HOST", "localhost"),

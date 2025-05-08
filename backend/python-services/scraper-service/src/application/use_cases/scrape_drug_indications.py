@@ -1,7 +1,7 @@
-from typing import Dict, Optional
-from domain.entities.drug_indication import DrugIndication
-from domain.repositories.drug_repository import DrugRepository
-from infrastructure.scraping.dailymed_scraper import DailyMedScraper
+from typing import Optional
+from core.entities.drug_indication import DrugIndication
+from infrastructure.repositories.drug.drug_repository import DrugRepository
+from application.services.scraping.dailymed_scraper_service import DailyMedScraper
 
 class ScrapeDrugUseCase:
     def __init__(self, scraper: DailyMedScraper, repository: DrugRepository):

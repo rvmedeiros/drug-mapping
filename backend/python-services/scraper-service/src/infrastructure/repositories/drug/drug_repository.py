@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Optional
-from domain.entities.drug_indication import DrugIndication
+from core.entities.drug_indication import DrugIndication
 
 class DrugRepository(ABC):
     @abstractmethod

@@ -1,8 +1,8 @@
 from datetime import datetime, timezone
 from typing import Optional
 from pymongo.database import Database
-from domain.entities.drug_indication import DrugIndication
-from domain.repositories.drug_repository import DrugRepository
+from core.entities.drug_indication import DrugIndication
+from infrastructure.repositories.drug.drug_repository import DrugRepository
 
 class MongoDBDrugRepository(DrugRepository):
     def __init__(self, mongo_db: Database):

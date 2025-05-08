@@ -1,7 +1,7 @@
 import logging
-from infrastructure.scraping.dailymed_scraper import DailyMedScraper
+from application.services.scraping.dailymed_scraper_service import DailyMedScraper
 from application.use_cases.scrape_drug_indications import ScrapeDrugUseCase
-from domain.repositories.drug_repository import DrugRepository
+from infrastructure.repositories.drug.drug_repository import DrugRepository
 
 logger = logging.getLogger(__name__)
 

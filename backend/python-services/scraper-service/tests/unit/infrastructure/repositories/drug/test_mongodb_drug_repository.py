@@ -1,7 +1,7 @@
 import pytest
-from domain.entities.drug_indication import DrugIndication
+from src.core.entities.drug_indication import DrugIndication
 from infrastructure.repositories.drug.repositories import MongoDBDrugRepository
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 
 import mongomock
 
