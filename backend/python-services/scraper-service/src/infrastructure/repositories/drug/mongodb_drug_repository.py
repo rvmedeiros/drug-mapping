@@ -11,7 +11,7 @@ class MongoDBDrugRepository(DrugRepository):
     def save(self, indication: DrugIndication) -> str:
         data = {
             "drug_name": indication.drug_name,
-            "raw_data": indication.raw_data,
+            "indications": indication.indications,
             "metadata": indication.metadata,
             "status": indication.status,
             "created_at": indication.created_at,

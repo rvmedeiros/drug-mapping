@@ -13,10 +13,10 @@ class MapperService:
             labels = self.repository.get_unprocessed_labels(1)
             
             for label in labels:
-                if not label.raw_data:
+                if not label.indications:
                     print("No raw items found. Waiting...")
-                for item in label.raw_data:
-                    if not label.raw_data:
+                for item in label.indications:
+                    if not label.indications:
                         print("No raw items found. Waiting...")
                         continue
                 

@@ -15,7 +15,7 @@ class ScrapeDrugUseCase:
             
         indication = DrugIndication(
             drug_name=scraped_data['drug_name'],
-            raw_data=scraped_data['raw_data'],
+            indications=scraped_data['indications'],
             metadata=scraped_data['metadata']
         )
         

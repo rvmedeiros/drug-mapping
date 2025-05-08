@@ -33,13 +33,13 @@ class MongoDrugRepository(DrugLabelInterface):
     def _document_to_entity(self, doc) -> DrugLabel:
         return DrugLabel(
             id=str(doc["_id"]),
-            raw_data=doc["raw_data"],
+            indications=doc["indications"],
             status=doc["status"],
         )
     
     def _entity_to_document(self, entity: DrugLabel) -> dict:
         return {
-            "raw_data": entity.raw_data,
+            "indications": entity.indications,
             "status": entity.status,
             "updated_at": entity.updated_at
         }

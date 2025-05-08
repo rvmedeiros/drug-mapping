@@ -11,6 +11,6 @@ class ProcessedIndication:
 @dataclass
 class DrugLabel:
     id: str
-    raw_data: List[str]
+    indications: List[str]
     status: str
     updated_at: Optional[datetime] = None

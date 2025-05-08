@@ -36,7 +36,7 @@ class DailyMedScraper:
 
                 return {
                     "drug_name": drug_name,
-                    "raw_data": subsections_content,
+                    "indications": subsections_content,
                     "metadata": {
                         "source": "DailyMed",
                         "scraped_at": datetime.now().isoformat(),
