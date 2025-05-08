@@ -6,12 +6,15 @@ import {
   Param,
   Put,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 
 import { UserService } from './user.service';
 import { CreateUserDto } from './create-user.dto';
 import { User } from './user.entity';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Roles } from '../auth/roles.decorator';
+import { Role } from '../auth/roles.enum';
 
 @ApiTags('users')
 @Controller('users')
@@ -26,6 +29,7 @@ export class UserController {
   }
 
   @Get()
+  @Roles(Role.Admin)
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'List of users.' })
   async findAll(): Promise<User[]> {
@@ -33,6 +37,7 @@ export class UserController {
   }
 
   @Get(':id')
+  @Roles(Role.Admin)
   @ApiOperation({ summary: 'Get user by ID' })
   @ApiResponse({ status: 200, description: 'User details.' })
   async findOne(@Param('id') id: number): Promise<User | null> {
@@ -40,6 +45,7 @@ export class UserController {
   }
 
   @Put(':id')
+  @Roles(Role.Admin)
   @ApiOperation({ summary: 'Update user by ID' })
   @ApiResponse({ status: 200, description: 'User updated successfully.' })
   async update(
@@ -50,6 +56,7 @@ export class UserController {
   }
 
   @Delete(':id')
+  @Roles(Role.Admin)
   @ApiOperation({ summary: 'Delete user by ID' })
   @ApiResponse({ status: 200, description: 'User deleted successfully.' })
   async remove(@Param('id') id: number): Promise<void> {
