@@ -1,0 +1,103 @@
+version: '3.8'
+
+services:
+  # MongoDB Service
+  mongodb:
+    image: mongo:6.0
+    container_name: drug-mongodb
+    env_file: .env  # Vai carregar todas as variáveis do arquivo .env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro  # Inicialização de dados do MongoDB
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')", "--quiet"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # PostgreSQL Service
+  postgres:
+    image: postgres:15-alpine
+    container_name: drug-postgres
+    env_file: .env  # Carrega o arquivo .env, que contém as variáveis do banco
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: /data/postgres
+      PGDATABASE: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # Redis Service
+  redis:
+    image: redis:7-alpine
+    container_name: drug-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # API Gateway (NestJS)
+  api-gateway:
+    build: ./backend/api-gateway
+    container_name: api-gateway
+    env_file: ./backend/api-gateway/.env  # Certifique-se de que o arquivo .env exista neste caminho
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
+      - postgres
+      - redis
+    restart: unless-stopped
+
+  # drug-label-processor (Python Service)
+  drug-label-processor:
+    build: ./backend/python-services/drug-label-processor
+    container_name: drug-label-processor
+    env_file: ./backend/python-services/drug-label-processor/.env  # Certifique-se de que o arquivo .env exista neste caminho
+    environment:
+      - RUNNING=true
+    restart: unless-stopped
+
+  # scraper-service (Python API)
+  scraper-service:
+    build: ./backend/python-services/scraper-service
+    container_name: scraper-service
+    env_file: ./backend/python-services/scraper-service/.env  # Certifique-se de que o arquivo .env exista neste caminho
+    environment:
+      - RUNNING=true
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+
+volumes:
+  mongodb_data:
+    driver: local
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local

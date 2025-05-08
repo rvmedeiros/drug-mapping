@@ -1,6 +1,5 @@
 .pytest_cache
 node_modules
-.env
 .vscode
 # Python
 __pycache__/
@@ -24,14 +23,6 @@ wheels/
 .installed.cfg
 *.egg
 
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
 
 # IDE
 .vscode/
