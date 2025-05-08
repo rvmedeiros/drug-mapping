@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import patch, MagicMock
-from src.infrastructure.llm.phi2_indication_mapper import Phi2IndicationMapper
+from src.infrastructure.mapper.phi2_indication_mapper import Phi2IndicationMapper
 
 @pytest.fixture
 def mapper():
