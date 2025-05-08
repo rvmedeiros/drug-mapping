@@ -1,10 +1,10 @@
-import { Injectable, OnModuleInit, Logger } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import * as bcrypt from "bcrypt";
-
-import { User } from "./user.entity";
-import { CreateUserDto } from "./create-user.dto";
+import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
+import { ConfigService } from '@nestjs/config';
+import { User } from './user.entity';
+import { CreateUserDto } from './create-user.dto';
 
 @Injectable()
 export class UserService implements OnModuleInit {
@@ -12,13 +12,20 @@ export class UserService implements OnModuleInit {
 
   constructor(
     @InjectRepository(User)
-    private userRepository: Repository<User>
+    private userRepository: Repository<User>,
+    private configService: ConfigService,
   ) {}
 
   private async ensureAdminUser() {
-    const adminUsername = "admin";
-    const adminPassword = "admin123";
-    const adminRole = "admin";
+    const adminUsername = this.configService.get<string>(
+      'ADMIN_USERNAME',
+      'admin',
+    );
+    const adminPassword = this.configService.get<string>(
+      'ADMIN_PASSWORD',
+      'admin123',
+    );
+    const adminRole = this.configService.get<string>('ADMIN_ROLE', 'admin');
 
     const existingAdmin = await this.userRepository.findOne({
       where: { username: adminUsername },
@@ -34,9 +41,9 @@ export class UserService implements OnModuleInit {
       });
 
       await this.userRepository.save(adminUser);
-      this.logger.log("Admin user created successfully");
+      this.logger.log('Admin user created successfully');
     } else {
-      this.logger.log("Admin user already exists");
+      this.logger.log('Admin user already exists');
     }
   }
 
