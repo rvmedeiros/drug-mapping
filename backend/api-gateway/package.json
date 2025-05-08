@@ -34,7 +34,7 @@
     "typescript": "^5.0.4",
     "ts-node": "^10.9.1"
   },
-  "type": "module",
+  "type": "commonjs",
   "engines": {
     "node": ">=16.0.0"
   },
