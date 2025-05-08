@@ -1,0 +1,22 @@
+[project]
+name = "drug-label-processor"
+version = "0.1.0"
+description = "Drug label processor with ICD-10 mapping"
+authors = [{name = "Rafael Vasconcellos de Medeiros", email = "rafaeldesenv.net@gmail.com"}]
+requires-python = ">=3.9"
+dependencies = [
+    "pymongo",
+    "transformers",
+    "torch",
+    "python-dotenv",
+    "pytest",
+    "pytest-cov"
+]
+
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
