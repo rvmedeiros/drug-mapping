@@ -1,0 +1,26 @@
+[project]
+name = "scraper-service"
+version = "0.1.0"
+description = "scraper dailymed website"
+authors = [{name = "Rafael Vasconcellos de Medeiros", email = "rafaeldesenv.net@gmail.com"}]
+requires-python = ">=3.9"
+dependencies = [
+    "fastapi˜,
+    "uvicorn",
+    "pymongo",
+    "psycopg2-binary",
+    "redis",
+    "python-dotenv",
+    "requests",
+    "dnspython",
+    "playwright"
+]
+
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+addopts = "--cov=src --cov-report=term-missing"
