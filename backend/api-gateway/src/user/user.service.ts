@@ -73,7 +73,10 @@ export class UserService implements OnModuleInit {
     return this.userRepository.findOne({ where: { username } });
   }
 
-  async updateUser(id: number, updateDto: Partial<User>): Promise<User | null> {
+  async updateUser(
+    id: number,
+    updateDto: Partial<CreateUserDto>,
+  ): Promise<User | null> {
     if (updateDto.password) {
       updateDto.password = await bcrypt.hash(updateDto.password, 10);
     }
