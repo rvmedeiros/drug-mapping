@@ -15,7 +15,7 @@ def mock_mongo_db():
 def drug_indication():
     return DrugIndication(
         drug_name="Aspirin",
-        raw_data="Some raw data",
+        indications="Some raw data",
         metadata={"key": "value"},
         status="approved",
         created_at=datetime.now(timezone.utc),
@@ -33,7 +33,7 @@ def test_save_creates_or_updates_drug_indication(repository, drug_indication, mo
     saved_data = collection.find_one({"drug_name": drug_indication.drug_name})
 
     assert saved_data["drug_name"] == drug_indication.drug_name
-    assert saved_data["raw_data"] == drug_indication.raw_data
+    assert saved_data["indications"] == drug_indication.indications
     assert saved_data["metadata"] == drug_indication.metadata
     assert saved_data["status"] == drug_indication.status
     assert "created_at" in saved_data
@@ -45,7 +45,7 @@ def test_get_by_drug_name_returns_drug_indication(repository, drug_indication, m
 
     assert result is not None
     assert result.drug_name == drug_indication.drug_name
-    assert result.raw_data == drug_indication.raw_data
+    assert result.indications == drug_indication.indications
     assert result.metadata == drug_indication.metadata
     assert result.status == drug_indication.status
     assert result.created_at is not None

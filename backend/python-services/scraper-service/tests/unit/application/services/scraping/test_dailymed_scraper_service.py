@@ -16,4 +16,4 @@ def test_get_indications():
     assert 'dupixent' in indications['drug_name'].lower()
     assert 'raw' in indications['status'].lower()
     assert '1.0' in indications['metadata']['version']
-    assert len(indications['raw_data']) > 0
+    assert len(indications['indications']) > 0
