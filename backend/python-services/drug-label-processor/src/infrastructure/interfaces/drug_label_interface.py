@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List
 from core.entities.drug_label import DrugLabel
 
-class DrugLabelRepository(ABC):
+class DrugLabelInterface(ABC):
     @abstractmethod
     def get_unprocessed_labels(self, limit: int) -> List[DrugLabel]:
         """Retrieve unprocessed drug labels from the repository"""

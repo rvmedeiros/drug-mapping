@@ -1,61 +1,45 @@
 from typing import List
+from bson import ObjectId
 from pymongo.collection import Collection
-from core.entities.drug_label import DrugLabel, ProcessedIndication
-from infrastructure.interfaces.drug_label_interface import DrugLabelRepository
+from core.entities.drug_label import DrugLabel
+from infrastructure.interfaces.drug_label_interface import DrugLabelInterface
+from datetime import datetime
 
-class MongoDrugLabelRepository(DrugLabelRepository):
-    def __init__(self, collection: Collection):
-        self.collection = collection
+class MongoDrugRepository(DrugLabelInterface):
+    def __init__(self, db, collection_name: str = 'indications'):
+        self.collection = db[collection_name]
     
     def get_unprocessed_labels(self, limit: int) -> List[DrugLabel]:
         cursor = self.collection.find({"status": "raw"}).limit(limit)
         return [self._document_to_entity(doc) for doc in cursor]
     
     def update_label(self, label: DrugLabel) -> None:
-        self.collection.update_one(
-            {"_id": label.id},
-            {"$set": self._entity_to_document(label)}
+        update_data = self._entity_to_document(label)
+        update_data["updated_at"] = datetime.now()
+        update_data["status"] = "processed" 
+        
+        label_id = ObjectId(label.id) if isinstance(label.id, str) else label.id
+        
+        result = self.collection.update_one(
+            {"_id": label_id},
+            {"$set": update_data}
         )
+        
+        if result.modified_count == 0:
+            print(f"Failed to update label with id {label.id}")
+        else:
+            print(f"Successfully updated label with id {label.id}")
     
     def _document_to_entity(self, doc) -> DrugLabel:
-        processed_indications = None
-        if "processed_indications" in doc:
-            processed_indications = [
-                ProcessedIndication(
-                    original_text=pi["original_text"],
-                    icd10_codes=pi["icd10_codes"],
-                    mapping_method=pi["mapping_method"]
-                )
-                for pi in doc["processed_indications"]
-            ]
-        
         return DrugLabel(
             id=str(doc["_id"]),
-            raw_text=doc["raw_text"],
-            indications=doc["indications"],
+            raw_data=doc["raw_data"],
             status=doc["status"],
-            processed_at=doc.get("processed_at"),
-            processed_indications=processed_indications,
-            error=doc.get("error")
         )
     
     def _entity_to_document(self, entity: DrugLabel) -> dict:
-        document = {
-            "raw_text": entity.raw_text,
-            "indications": entity.indications,
+        return {
+            "raw_data": entity.raw_data,
             "status": entity.status,
-            "processed_at": entity.processed_at,
-            "error": entity.error
+            "updated_at": entity.updated_at
         }
-        
-        if entity.processed_indications:
-            document["processed_indications"] = [
-                {
-                    "original_text": pi.original_text,
-                    "icd10_codes": pi.icd10_codes,
-                    "mapping_method": pi.mapping_method
-                }
-                for pi in entity.processed_indications
-            ]
-        
-        return document
