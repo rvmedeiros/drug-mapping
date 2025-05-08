@@ -1,6 +1,6 @@
 import pytest
 from datetime import datetime
-from src.core.entities.drug_label import DrugLabel, ProcessedIndication
+from core.entities.drug_label import DrugLabel, ProcessedIndication
 
 def test_create_drug_label():
     indication = ProcessedIndication(

@@ -1,15 +1,19 @@
 import pytest
-from pymongo import MongoClient
-from src.infrastructure.database.mongo_database import MongoDrugLabelRepository
-from src.core.entities.drug_label import DrugLabel
+from unittest.mock import MagicMock
+from core.entities.drug_label import DrugLabel
+from infrastructure.repositories.mongo_drug_label_repository import MongoDrugLabelRepository
 
 @pytest.fixture
-def mongo_repository(mongo):
-    client = MongoClient(mongo)
-    db = client["test_db"]
-    collection = db["test_collection"]
-    collection.delete_many({})
-    return MongoDrugLabelRepository(collection)
+def mock_collection():
+    collection = MagicMock()
+    cursor_mock = MagicMock()
+    cursor_mock.limit.return_value = [{"_id": "1", "raw_text": "test text", "indications": ["ind1", "ind2"], "status": "raw"}]
+    collection.find.return_value = cursor_mock
+    return collection
+
+@pytest.fixture
+def mongo_repository(mock_collection):
+    return MongoDrugLabelRepository(mock_collection)
 
 def test_save_and_retrieve_label(mongo_repository):
     label = DrugLabel(
