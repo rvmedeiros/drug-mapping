@@ -1,17 +1,25 @@
-import { Test, TestingModule } from "@nestjs/testing";
-import { UserService } from "./user.service";
-import { getRepositoryToken } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { User } from "./user.entity";
+import { Test, TestingModule } from '@nestjs/testing';
+import { UserService } from './user.service';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { User } from './user.entity';
+import { Repository } from 'typeorm';
+import { ConfigService } from '@nestjs/config';
+import * as bcrypt from 'bcrypt';
 
-describe("UserService", () => {
+describe('UserService', () => {
   let service: UserService;
-  let repo: Repository<User>;
+  let userRepository: Repository<User>;
 
   const mockUserRepository = {
+    findOne: jest.fn(),
     create: jest.fn(),
     save: jest.fn(),
-    findOne: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+  };
+
+  const mockConfigService = {
+    get: jest.fn().mockReturnValue('admin'),
   };
 
   beforeEach(async () => {
@@ -22,28 +30,31 @@ describe("UserService", () => {
           provide: getRepositoryToken(User),
           useValue: mockUserRepository,
         },
+        {
+          provide: ConfigService,
+          useValue: mockConfigService,
+        },
       ],
     }).compile();
 
     service = module.get<UserService>(UserService);
-    repo = module.get<Repository<User>>(getRepositoryToken(User));
+    userRepository = module.get<Repository<User>>(getRepositoryToken(User));
   });
 
-  it("should create a new user", async () => {
-    const userDto = { username: "test", password: "1234", role: "admin" };
-    const hashedPassword = "hashed1234";
-    const createdUser = { ...userDto, id: 1, password: hashedPassword };
+  it('should be defined', () => {
+    expect(service).toBeDefined();
+  });
 
-    mockUserRepository.create.mockReturnValue(createdUser);
-    mockUserRepository.save.mockResolvedValue(createdUser);
+  it('should create an admin user if it does not exist', async () => {
+    mockUserRepository.findOne.mockResolvedValueOnce(null);
+    mockUserRepository.save.mockResolvedValueOnce(true);
 
-    const result = await service.createUser(userDto);
+    await service.onModuleInit();
 
-    expect(mockUserRepository.create).toHaveBeenCalledWith({
-      ...userDto,
-      password: expect.any(String),
+    expect(mockUserRepository.create).toHaveBeenCalled();
+    expect(mockUserRepository.save).toHaveBeenCalled();
+    expect(mockUserRepository.findOne).toHaveBeenCalledWith({
+      where: { username: 'admin' },
     });
-    expect(mockUserRepository.save).toHaveBeenCalledWith(createdUser);
-    expect(result).toEqual(createdUser);
   });
 });
