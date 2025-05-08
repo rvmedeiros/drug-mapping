@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List
-from src.core.entities.drug_label import DrugLabel
+from core.entities.drug_label import DrugLabel
 
 class DrugLabelRepository(ABC):
     @abstractmethod

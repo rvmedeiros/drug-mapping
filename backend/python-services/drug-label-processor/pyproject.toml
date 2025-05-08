@@ -6,8 +6,6 @@ authors = [{name = "Rafael Vasconcellos de Medeiros", email = "rafaeldesenv.net@
 requires-python = ">=3.9"
 dependencies = [
     "pymongo",
-    "transformers",
-    "torch",
     "python-dotenv",
     "pytest",
     "pytest-cov"
@@ -20,3 +18,4 @@ build-backend = "setuptools.build_meta"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = "test_*.py"
+pythonpath = "src"

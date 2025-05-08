@@ -3,7 +3,7 @@ from groq import AsyncGroq
 import asyncio
 import os
 from dotenv import load_dotenv
-from src.application.interfaces.indication_mapper_interface import IndicationMapper
+from application.interfaces.indication_mapper_interface import IndicationMapper
 
 class Phi2IndicationMapper(IndicationMapper):
     def __init__(self):

@@ -1,7 +1,7 @@
 from typing import List
 from pymongo.collection import Collection
-from src.core.entities.drug_label import DrugLabel, ProcessedIndication
-from src.infrastructure.interfaces.drug_label_interface import DrugLabelRepository
+from core.entities.drug_label import DrugLabel, ProcessedIndication
+from infrastructure.interfaces.drug_label_interface import DrugLabelRepository
 
 class MongoDrugLabelRepository(DrugLabelRepository):
     def __init__(self, collection: Collection):
