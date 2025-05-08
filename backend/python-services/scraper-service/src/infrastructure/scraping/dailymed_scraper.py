@@ -1,51 +1,40 @@
 import os
 from dotenv import load_dotenv
 from typing import Dict, List, Any
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
 from datetime import datetime
 
 load_dotenv()
 DAILYMED_URL = os.getenv("DAILYMED_URL")
 
+
 class DailyMedScraper:
-    def get_indications(self, drug_name: str) -> List :
-        driver = None
+    def get_indications(self, drug_name: str) -> Any:
         url = f"{DAILYMED_URL}/search.cfm?query={drug_name}"
         try:
-            chrome_options = Options()
-            chrome_options.add_argument("--headless")
-            chrome_options.add_argument("--disable-gpu")
-            chrome_options.add_argument("--no-sandbox")
-            chrome_options.add_argument("--disable-dev-shm-usage")
-            
-            driver = webdriver.Chrome(options=chrome_options)
-            driver.get(url)
-            wait = WebDriverWait(driver, 30)
+            with sync_playwright() as p:
+                browser = p.chromium.launch(headless=True)
+                page = browser.new_page()
+                page.goto(url, timeout=30000)
 
-            WebDriverWait(driver, 30).until(EC.url_changes(url))
-            WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
-            
-            indication_section = wait.until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, "div.drug-label-sections"))
-            )
-            
-            indication_item = self._find_indications_item(indication_section)
-            if not indication_item:
-                print("Could not find 'INDICATIONS AND USAGE' section")
-                return None
+                page.wait_for_load_state("networkidle", timeout=30000)
+                page.wait_for_selector("body", timeout=30000)
+                page.wait_for_selector("div.drug-label-sections", timeout=30000)
 
-            subsections_content = self._process_subsections(indication_item)
-            
-            if not subsections_content:
-                print("No valid indications found in subsections")
-                return None
+                indication_section = page.query_selector("div.drug-label-sections")
 
+                indication_item = self._find_indications_item(indication_section)
+                if not indication_item:
+                    print("Could not find 'INDICATIONS AND USAGE' section")
+                    return None
 
-            return {
+                subsections_content = self._process_subsections(indication_item)
+
+                if not subsections_content:
+                    print("No valid indications found in subsections")
+                    return None
+
+                return {
                     "drug_name": drug_name,
                     "raw_data": subsections_content,
                     "metadata": {
@@ -53,35 +42,35 @@ class DailyMedScraper:
                         "scraped_at": datetime.now().isoformat(),
                         "version": "1.0"
                     },
-                    "status": "raw" 
+                    "status": "raw"
                 }
-                            
+
+        except PlaywrightTimeoutError as e:
+            print(f"Timeout while scraping indications: {str(e)}")
+            return None
         except Exception as e:
             print(f"Error while scraping indications: {str(e)}")
             return None
-        finally:
-            if driver:
-                driver.quit()
 
     def _find_indications_item(self, section) -> Any:
         """Helper to locate the INDICATIONS AND USAGE list item"""
-        indication_list = section.find_element(By.XPATH, ".//ul")
-        list_items = indication_list.find_elements(By.XPATH, ".//li")
+        indication_list = section.query_selector("ul")
+        list_items = indication_list.query_selector_all("li")
 
         for item in list_items:
-            if "INDICATIONS AND USAGE" in item.text:
-                return item.find_element(
-                    By.XPATH, 
-                    ".//div[contains(@class, 'Section toggle-content closed long-content')]"
+            text = item.inner_text()
+            if "INDICATIONS AND USAGE" in text:
+                return item.query_selector(
+                    "div.Section.toggle-content.closed.long-content"
                 )
         return None
 
     def _process_subsections(self, section_div) -> List[Dict[str, Any]]:
         """Process all subsections in the indications section with updated field names"""
         sections = []
-        
-        all_sections = section_div.find_elements(By.XPATH, ".//div[contains(@class, 'Section') and .//h2]")
-        
+
+        all_sections = section_div.query_selector_all("div.Section:has(h2)")
+
         for section in all_sections:
             section_data = {
                 'section_identifier': '',
@@ -89,32 +78,31 @@ class DailyMedScraper:
                 'clinical_content': '',
                 'usage_restrictions': {}
             }
-            
+
             try:
-                h2 = section.find_element(By.XPATH, ".//h2")
-                h2 = h2.get_attribute('textContent').strip()
-                
+                h2 = section.query_selector("h2").inner_text().strip()
                 if '\t' in h2:
-                    section_identifier, section_header  = h2.split('\t')
+                    section_identifier, section_header = h2.split('\t')
                     section_data['section_identifier'] = section_identifier
                     section_data['section_header'] = section_header
                 else:
                     section_data['section_header'] = h2
-                    
             except:
                 continue
-                
+
             try:
-                section_data['clinical_content'] = section.find_element(
-                    By.XPATH, ".//p[@class='First']").get_attribute('textContent').strip()
+                first_p = section.query_selector("p.First")
+                if first_p:
+                    section_data['clinical_content'] = first_p.inner_text().strip()
             except:
                 pass
-                
+
             try:
-                for sub in section.find_elements(By.XPATH, ".//div[contains(@class, 'Section')][not(.//h2)]"):                    
+                subs = section.query_selector_all("div.Section:not(:has(h2))")
+                for sub in subs:
                     try:
-                        limitation_title = sub.find_element(By.XPATH, ".//span[@class='Underline']").get_attribute('textContent').replace(':', '').strip()
-                        description =  sub.find_element(By.XPATH, ".//p[not(@class='First')]//span[@class='XmChange']").get_attribute('textContent').strip()                    
+                        limitation_title = sub.query_selector("span.Underline").inner_text().replace(':', '').strip()
+                        description = sub.query_selector("p:not(.First) span.XmChange").inner_text().strip()
                         if 'limitations' in limitation_title.lower():
                             section_data['usage_restrictions'] = {
                                 'restriction_type': limitation_title,
@@ -124,6 +112,7 @@ class DailyMedScraper:
                         continue
             except:
                 pass
+
             sections.append(section_data)
-            
+
         return [s for s in sections if s['section_header']]
